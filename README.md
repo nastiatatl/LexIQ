@@ -11,11 +11,11 @@ possible solutions:
 as of now, you can input words and the app will display their synonyms
 
 TODO:
-- quiz generation
+- quiz generation - sort of done, needs testing with actual quizzes
 - synonyms caching/database
 - quiz caching/database
-- quiz page
-  - scoring
+- quiz page - done
+  - scoring - partially done, need to fix styling
 - testing
 - requirements.txt (already started)
-- formatting (doesn't look too pretty now)
+- formatting - started experimenting
