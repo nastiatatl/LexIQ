@@ -4,37 +4,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Welcome</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-        }
-        form {
-            margin-top: 50px;
-        }
-        label {
-            font-weight: bold;
-        }
-        input[type="text"] {
-            width: 300px;
-            height: 30px;
-        }
-        input[type="submit"] {
-            padding: 10px 20px;
-            background-color: #007bff;
-            color: #fff;
-            border: none;
-            cursor: pointer;
-        }
-    </style>
+    <link rel="stylesheet" href="/static/app.css"> <!-- Link to shared CSS file -->
 </head>
 <body>
     <h1>Welcome to LexIQ!</h1>
     <form action="/save_words" method="post">
         <label for="words">Enter your vocabulary (separated by comma, space, or newline):</label><br>
-        <textarea id="words" name="words" rows="5" cols="50"></textarea><br><br>
+        <textarea id="words" name="words" rows="5"></textarea><br><br>
         <input type="submit" value="Submit">
     </form>
+    <a href="/quiz"><button>Take a Quiz</button></a>
 </body>
 </html>
+
+
 
 
