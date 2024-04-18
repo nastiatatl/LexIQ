@@ -6,23 +6,112 @@ body {
     line-height: 1.6;
     margin: 0;
     padding: 0;
-}
-
-/* Container for content to center it */
-.container {
-    width: 80%;
-    margin: auto;
-    overflow: hidden;
-    position: relative; 
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
 }
 
 /* Header Styling */
 header {
-    background-color: #0056b3;
-    color: #ffffff;
     padding: 20px 0;
     text-align: center;
-    font-size: 24px;
+    font-size: 32px;
+    margin-top: -20px;
+}
+
+/* Main Content Area */
+main {
+    background-color: white;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 50%;
+    max-width: 1000px;
+}
+
+/* Question Styles */
+.question input[type="radio"] {
+    vertical-align: middle;
+    margin-right: 10px;
+}
+.question label {
+    vertical-align: middle;
+    display: inline-block;
+    margin-right: 20px;
+}
+
+/* Button Styles */
+.btn, .button-container button, input[type="submit"] {
+    padding: 10px 15px;
+    background-color: #0056b3;
+    color: white;
+    border: none;
+    cursor: pointer;
+    font-size: 14px;
+    border-radius: 5px;
+    margin: 0 5px;
+}
+
+.btn:hover, .button-container button:hover, input[type="submit"]:hover {
+    background-color: #004494;
+}
+
+/* Button Container */
+.button-container {
+    text-align: center;
+    position: relative;
+    margin-top: 20px;
+    display: flex;
+    bottom: -30px;
+    justify-content: center;
+    margin-bottom: -30px;
+    gap: 10px;
+}
+
+/* File Upload Container */
+.file-upload-container {
+    text-align: center;
+    margin: 10px 0;
+}
+
+/* Footer Styling */
+footer {
+    background-color: #333;
+    color: white;
+    text-align: center;
+    width: 100%;
+    margin-top: auto;
+}
+
+/* Label Styles */
+label {
+    display: block;
+    text-align: center;
+    margin: 10px 0;
+}
+
+/* Input Styles */
+textarea, input[type="file"] {
+    width: 100%;
+    max-width: 500px;
+    margin: 10px 0;
+    display: block;
+}
+
+/* Responsive Media Queries */
+@media only screen and (max-width: 768px) {
+    main, .btn, .button-container button, input[type="submit"],
+    textarea, input[type="file"] {
+        width: 95%; /* Full width on small screens */
+    }
+
+    header {
+        font-size: 24px; /* Adjust font size for smaller screens */
+        padding: 15px 0; /* Adjust padding for smaller screens */
+    }
 }
 
 /* Navigation Styling */
@@ -41,102 +130,4 @@ nav a {
 
 nav a:hover {
     background: #003073;
-}
-
-/* Main content area */
-main {
-    margin-top: 20px;
-    padding: 20px;
-    background: white;
-    min-height: 400px;
-    box-shadow: 0 0 10px 0 rgba(0,0,0,0.1);
-}
-
-.button-container {
-    width: 100%;
-    position: absolute;
-    left: 0;
-    bottom: 20px;
-    text-align: center;
-}
-
-/* Styles for individual buttons */
-.button-container button {
-    margin: 0 5px;
-    padding: 10px 20px;
-    background-color: #0056b3;
-    color: white;
-    border: none;
-    cursor: pointer;
-    font-size: 16px;
-    border-radius: 5px;
-    display: inline-block;
-}
-
-.button-container button:hover {
-    background-color: #004494; 
-}
-
-/* Footer styling */
-footer {
-    background-color: #333;
-    color: #ffffff;
-    text-align: center;
-    padding: 10px;
-    position: relative;
-    bottom: 0;
-    width: 100%;
-}
-
-/* Styles for forms and their elements */
-form {
-    margin-top: 20px;
-}
-
-label, input[type="radio"] {
-    display: inline-block;
-    margin-right: 10px;
-    vertical-align: middle;
-}
-
-input[type="text"], input[type="radio"] {
-    margin-right: 10px;
-}
-
-input[type="submit"], button {
-    background-color: #0056b3;
-    color: #ffffff;
-    border: none;
-    padding: 10px 20px;
-    cursor: pointer;
-    font-size: 16px;
-    border-radius: 5px;
-}
-
-input[type="submit"]:hover, button:hover {
-    background-color: #004494;
-}
-
-/* Utility Classes for spacing */
-.padding {
-    padding: 20px;
-}
-
-.margin-top {
-    margin-top: 20px;
-}
-
-/* Responsive Media Queries */
-@media only screen and (max-width: 768px) {
-    .container {
-        width: 95%;
-    }
-
-    header, footer {
-        text-align: center;
-    }
-
-    nav a {
-        padding: 10px;
-    }
 }
