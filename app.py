@@ -1,7 +1,13 @@
 from flask import Flask, render_template, request
 from utils import generate_synonyms, process_input
+from werkzeug.utils import secure_filename
+import os
+import csv
 
 app = Flask(__name__)
+
+# folder 'uploads' should be in the root directory
+app.config['UPLOAD_FOLDER'] = 'uploads'
 
 @app.route('/')
 def index():
@@ -9,13 +15,28 @@ def index():
 
 @app.route('/save_words', methods=['POST'])
 def save_words():
-    words = process_input(request.form['words'])
+    words = []  # Initialize the words list
 
-    synonyms = []
-    for word in words:
-        synonyms.append(generate_synonyms(word))
+    # Check if a file is present in the request
+    file = request.files.get('file')
+    if file and file.filename != '':
+        filename = secure_filename(file.filename)
+        filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+        file.save(filepath)
+        with open(filepath, 'r') as csvfile:
+            csvreader = csv.reader(csvfile)
+            for row in csvreader:
+                words.extend(row)  # Assuming each row contains one word
+    else:
+        # When no file is uploaded, process the text input
+        words_text = request.form.get('words', '')
+        if words_text:
+            words = process_input(words_text)
 
+    # Generate synonyms
+    synonyms = [generate_synonyms(word) for word in words]
     word_synonyms_pairs = list(zip(words, synonyms))
+    
     return render_template('display_words.html', word_synonyms_pairs=word_synonyms_pairs)
 
 @app.route('/quiz', methods=['POST', 'GET'])
