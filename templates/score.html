@@ -4,26 +4,25 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Score</title>
-    <link rel="stylesheet" href="/static/app.css"> <!-- Link to shared CSS file -->
+    <link rel="stylesheet" href="/static/app.css">
 </head>
 <body>
     <header>
         <h1>{{ message }}</h1>
     </header>
     
-    <main class="container">
-        {{ score }}/{{ total }}
+    <main> >
+        <p>{{ score }}/{{ total }}</p>
 
-    <div class="button-container">
-        <button onclick="window.location.href='/quiz'">Try Again</button>
-        <button onclick="window.location.href='/'">Back</button>
-    </div>
+        <div class="button-container">
+            <button onclick="window.location.href='/quiz'">Try Again</button>
+            <button onclick="window.location.href='/'">Back</button>
+        </div>
     </main>
 
     <footer>
-        <p>Practice make perfect</p> 
+        <p>Practice makes perfect</p> 
     </footer>
 
 </body>
 </html>
-

@@ -4,13 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Quiz</title>
-    <link rel="stylesheet" href="/static/app.css"> <!-- Link to shared CSS file -->
+    <link rel="stylesheet" href="/static/app.css">
 </head>
 <body>
     <header>
-        <h1>Quiz Time!</h1> 
+        <h1>Quiz Time!</h1>
     </header>
-    <main class="container"> 
+    <main> 
         <form action="/submit-quiz" method="post">
             {% for question in questions %}
                 <div class="question"> 
