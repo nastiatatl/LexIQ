@@ -4,19 +4,25 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Welcome</title>
-    <link rel="stylesheet" href="/static/app.css"> <!-- Link to shared CSS file -->
+    <link rel="stylesheet" href="/static/app.css">
 </head>
 <body>
-    <h1>Welcome to LexIQ!</h1>
-    <form action="/save_words" method="post">
-        <label for="words">Enter your vocabulary (separated by comma, space, or newline):</label><br>
-        <textarea id="words" name="words" rows="5"></textarea><br><br>
-        <input type="submit" value="Submit">
-    </form>
-    <a href="/quiz"><button>Take a Quiz</button></a>
+    <header><h1>Welcome to LexIQ!</h1></header>
+    <main>
+        <form action="/save_words" method="post" enctype="multipart/form-data">
+            <label for="words">Enter your vocabulary (separated by comma, space, or newline):</label>
+            <textarea id="words" name="words" rows="5"></textarea>
+            
+            <label for="file-upload" class="file-upload-label">or upload a CSV file:</label>
+                <div class="file-upload-container">
+                    <input type="file" id="file-upload" name="file" accept=".csv">
+                </div>
+            
+            <div class="button-container">
+                <input type="submit" value="Submit" class="btn">
+                <button type="button" onclick="window.location.href='/quiz'" class="btn">Take a Quiz</button>
+            </div>
+        </form>
+    </main>
 </body>
 </html>
-
-
-
-
