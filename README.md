@@ -6,16 +6,16 @@ wordhoard retrieves synonyms but it is very slow. it does use a caching system s
 possible solutions:
 - another library/api (nltk?)
 - create a cache file with most common words and their synonyms (might take forever, won't cover everything anyway)
-- ???
+- combine synonym retrieval and quiz generation, ask gpt to do both (given examples)
 
-as of now, you can input words and the app will display their synonyms
+as of now, you can input words or upload a csv file and the app will display their synonyms
 
 TODO:
 - quiz generation - sort of done, needs testing with actual quizzes
 - synonyms caching/database
 - quiz caching/database
 - quiz page - done
-  - scoring - partially done, need to fix styling
-- testing
+  - scoring - done, might want to add some statistics (now only displays the score)
+- testing - started, not yet pushed
 - requirements.txt (already started)
-- formatting - started experimenting
+- CSS styling - mostly done
