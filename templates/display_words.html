@@ -4,26 +4,26 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Saved Words and Synonyms</title>
-    <link rel="stylesheet" href="/static/app.css"> <!-- Link to shared CSS -->
+    <link rel="stylesheet" href="/static/app.css">
 </head>
 <body>
     <header>
         <h1>Your Words and Synonyms:</h1>
     </header>
     
-    <main class="container">
+    <main> 
         <ul>
             {% for word, synonym in word_synonyms_pairs %}
                 <li>{{ word }} - <span class="synonyms">{{ synonym }}</span></li>
             {% endfor %}
         </ul>
-        <button onclick="window.location.href='/'" class="back-button">Back</button> <!-- Use button for consistency -->
+        <div class="button-container">
+            <button onclick="window.location.href='/'">Back</button>
+        </div>
     </main>
     
     <footer>
-        <p>Review and learn your vocabulary here!</p>
+        <p>One's vocabulary needs constant fertilizing or it will die.</p>
     </footer>
 </body>
 </html>
-
-
