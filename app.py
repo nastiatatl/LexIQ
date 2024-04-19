@@ -9,6 +9,13 @@ app = Flask(__name__)
 # folder 'uploads' should be in the root directory
 app.config['UPLOAD_FOLDER'] = 'uploads'
 
+# NOTE: questions are hardcoded for now
+QUESTIONS = [
+    {"question": "The ___ alleyway made her feel uneasy as she walked home late at night.", "options": ["dark", "gloomy", "dim"], "answer": "dark"},
+    {"question": "The ___ lighting in the restaurant created a cozy and intimate atmosphere.", "options": ["dim", "gloomy", "dark"], "answer": "dim"},
+    {"question": "The weather that day was ___, matching his melancholic mood.", "options": ["gloomy", "dark", "dim"], "answer": "gloomy"},
+]
+
 @app.route('/')
 def index():
     return render_template('index.html')
@@ -42,53 +49,39 @@ def save_words():
 @app.route('/quiz', methods=['POST', 'GET'])
 def generate_quiz():
      #TODO: implement quiz generation, doesnt have to be in this format, thats just for testing
-    questions = [
-        {"question": "The ___ alleyway made her feel uneasy as she walked home late at night.",
-         "options": ["dark", "gloomy", "dim"], "answer": "dark"},
-        {"question": "The weather that day was ___, matching his melancholic mood.",
-         "options": ["gloomy", "dark", "dim"], "answer": "gloomy"},
-        {"question": "The ___ lighting in the restaurant created a cozy and intimate atmosphere.",
-         "options": ["dim", "gloomy", "dark"], "answer": "dim"}
-    ]
-    questions = [{"id": i, "data": question} for i, question in enumerate(questions)]
+    questions = [{"id": i, "data": question} for i, question in enumerate(QUESTIONS)]
     return render_template('quiz.html', questions=questions)
 
 
 @app.route('/submit-quiz', methods=['POST'])
 def submit_quiz():
-    # NOTE: questions are hardcoded for now
-    questions = [
-        {"question": "The ___ alleyway made her feel uneasy as she walked home late at night.", "options": ["dark", "gloomy", "dim"], "answer": "dark"},
-        {"question": "The weather that day was ___, matching his melancholic mood.", "options": ["gloomy", "dark", "dim"], "answer": "gloomy"},
-        {"question": "The ___ lighting in the restaurant created a cozy and intimate atmosphere.", "options": ["dim", "gloomy", "dark"], "answer": "dim"}
-    ]
-
-    # Calculate the score
+    # Calculate the score and gather feedback
     score = 0
-    for i, question in enumerate(questions):
+    feedback = []
+    for i, question in enumerate(QUESTIONS):
         user_answer = request.form.get(f'question{i}')
-        if user_answer == question['answer']:
+        is_correct = user_answer == question['answer']
+        if is_correct:
             score += 1
+        feedback.append({
+            'question': question['question'],
+            'options': question['options'],
+            'user_answer': user_answer,
+            'is_correct': is_correct
+        })
 
-    total_questions = len(questions)
+    total_questions = len(QUESTIONS)
     percentage = round((score / total_questions) * 100)
 
     # Determine the message based on the score
-    message = ""
-    if score == total_questions:
-        message = "PERFECTION!!!"
-    elif percentage >= 75:
-        message = "THAT WAS REALLY GOOD!!!"
-    elif percentage >= 50:
-        message = "GOOD JOB!!!"
-    elif percentage >= 25:
-        message = "NOT BAD!!!"
-    elif score > 0:
-        message = "NEED MORE PRACTICE!!!"
-    else:
-        message = ":("
+    message = "PERFECTION!!!" if score == total_questions else \
+              "THAT WAS REALLY GOOD!!!" if percentage >= 75 else \
+              "GOOD JOB!!!" if percentage >= 50 else \
+              "NOT BAD!!!" if percentage >= 25 else \
+              "NEED MORE PRACTICE!!!" if score > 0 else ":("
 
-    return render_template('score.html', score=score, total=total_questions, message=message)
+    return render_template('score.html', score=score, total=total_questions, message=message, feedback=feedback)
+
 
 
 

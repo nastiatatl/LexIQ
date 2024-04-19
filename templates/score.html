@@ -11,12 +11,26 @@
         <h1>{{ message }}</h1>
     </header>
     
-    <main> >
-        <p>{{ score }}/{{ total }}</p>
-
-        <div class="button-container">
-            <button onclick="window.location.href='/quiz'">Try Again</button>
-            <button onclick="window.location.href='/'">Back</button>
+    <main>
+        <div class="content">
+            <div class="score-display">
+                <p>Score: {{ score }}/{{ total }}</p>
+            </div>
+            {% for item in feedback %}
+                <div class="question">
+                    <p>{{ loop.index }}. {{ item.question }}</p>
+                    <p>Your answer: {{ item.user_answer }}</p>
+                    {% if item.is_correct %}
+                        <p class="correct">Correct! ✔</p>
+                    {% else %}
+                        <p class="incorrect">Incorrect! ✖</p>
+                    {% endif %}
+                </div>
+            {% endfor %}
+            <div class="button-container">
+                <button onclick="window.location.href='/quiz'" class="btn">Try Again</button>
+                <button onclick="window.location.href='/'" class="btn">Back</button>
+            </div>
         </div>
     </main>
 
