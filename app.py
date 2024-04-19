@@ -1,10 +1,13 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, session
 from utils import generate_synonyms, process_input
 from werkzeug.utils import secure_filename
 import os
 import csv
 
+from prompt import gpt3_5, prompt_from_vocab, distinct_prompt_from_vocab
+
 app = Flask(__name__)
+app.secret_key = "sdhgfvsjhdfsdyfhgieyrtgeyutg78w4cr5iu3vwntuyw98ytgladygaga"
 
 # folder 'uploads' should be in the root directory
 app.config['UPLOAD_FOLDER'] = 'uploads'
@@ -43,13 +46,16 @@ def save_words():
     # Generate synonyms
     synonyms = [generate_synonyms(word) for word in words]
     word_synonyms_pairs = list(zip(words, synonyms))
-    
+    # store words in session
+    session['words'] = words
     return render_template('display_words.html', word_synonyms_pairs=word_synonyms_pairs)
 
 @app.route('/quiz', methods=['POST', 'GET'])
 def generate_quiz():
-     #TODO: implement quiz generation, doesnt have to be in this format, thats just for testing
-    questions = [{"id": i, "data": question} for i, question in enumerate(QUESTIONS)]
+    #TODO: implement quiz generation, doesnt have to be in this format, thats just for testing
+    model_response = gpt3_5(prompt_from_vocab(session['words'])).split("\n")
+    questions = [{"question": q.replace(session['words'][i], "__________"), "options": [session['words'][i], generate_synonyms(session['words'][i]), generate_synonyms(session['words'][i])], "answer": session['words'][i]} for i, q in enumerate(model_response)]
+    questions = [{"id": i, "data": question} for i, question in enumerate(questions)]
     return render_template('quiz.html', questions=questions)
 
 
