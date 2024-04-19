@@ -11,21 +11,23 @@
         <h1>Quiz Time!</h1>
     </header>
     <main> 
-        <form action="/submit-quiz" method="post">
-            {% for question in questions %}
-                <div class="question"> 
-                    <p>{{ question.id + 1 }}. {{ question.data.question | safe }}</p>
-                    {% for option in question.data.options %}
-                        <input type="radio" id="question{{ question.id }}option{{ loop.index }}" name="question{{ question.id }}" value="{{ option }}">
-                        <label for="question{{ question.id }}option{{ loop.index }}">{{ option }}</label>
-                    {% endfor %}
+        <div class="content">
+            <form action="/submit-quiz" method="post">
+                {% for question in questions %}
+                    <div class="question"> 
+                        <p>{{ question.id + 1 }}. {{ question.data.question | safe }}</p>
+                        {% for option in question.data.options %}
+                            <input type="radio" id="question{{ question.id }}option{{ loop.index }}" name="question{{ question.id }}" value="{{ option }}">
+                            <label for="question{{ question.id }}option{{ loop.index }}">{{ option }}</label>
+                        {% endfor %}
+                    </div>
+                {% endfor %}
+                <div class="button-container">
+                    <button type="submit" class="btn">Submit</button>
+                    <button type="button" onclick="window.location.href='/'" class="btn">Back</button>
                 </div>
-            {% endfor %}
-            <div class="button-container">
-                <button type="submit">Submit</button>
-                <button type="button" onclick="window.location.href='/'">Back</button>
-            </div>
-        </form>
+            </form>
+        </div>
     </main>
     <footer>
         <p>Good luck!</p> 

@@ -4,14 +4,14 @@ body {
     background-color: #f0f2f5;
     color: #333;
     line-height: 1.6;
-    margin: 0;
-    padding: 0;
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
-    height: 100vh;
+    padding-bottom: 50px; /* Space for the footer */
+    overflow: scroll;
 }
+
+
 
 /* Header Styling */
 header {
@@ -21,15 +21,25 @@ header {
     margin-top: -20px;
 }
 
-/* Main Content Area */
 main {
+    margin-bottom: 60px;
+    width: 60%;
+}
+
+.content {
     background-color: white;
     box-shadow: 0 0 10px rgba(0,0,0,0.1);
     display: flex;
     flex-direction: column;
-    align-items: center;
-    width: 50%;
+    width: 60%;
     max-width: 1000px;
+    overflow-y: auto;
+    margin: 20px auto; 
+    padding-top: 20px;
+    padding-left: 150px;
+    padding-right: 150px;
+    padding-bottom: 20px;
+    height: auto;
 }
 
 /* Question Styles */
@@ -40,11 +50,27 @@ main {
 .question label {
     vertical-align: middle;
     display: inline-block;
-    margin-right: 20px;
+    margin-right: 10px;
+}
+
+.score-display {
+    padding: 10px;
+    background-color: #e8e8e8; /* Light grey background for contrast */
+    border-radius: 5px; /* Rounded corners */
+    width: fit-content; /* Shrink to fit the content */
+    margin: 20px auto; /* Center the block and add some margin above and below */
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+}
+
+.score-display p {
+    margin: 0; /* Remove default paragraph margin */
+    font-weight: bold; /* Make the score bold */
+    color: #333; /* Darker text for better readability */
+    font-size: 1.2rem; /* Slightly larger text */
 }
 
 /* Button Styles */
-.btn, .button-container button, input[type="submit"] {
+.btn, .content form input[type="submit"] {
     padding: 10px 15px;
     background-color: #0056b3;
     color: white;
@@ -55,26 +81,32 @@ main {
     margin: 0 5px;
 }
 
-.btn:hover, .button-container button:hover, input[type="submit"]:hover {
+.btn:hover, input[type="submit"]:hover {
     background-color: #004494;
+}
+
+.content form div{
+    background-color: white; /* Set the form's background color */
+    width: 100%;
+    /* Any additional styling you want to apply to the form */
 }
 
 /* Button Container */
 .button-container {
     text-align: center;
     position: relative;
-    margin-top: 20px;
     display: flex;
-    bottom: -30px;
     justify-content: center;
-    margin-bottom: -30px;
     gap: 10px;
+    padding-top: 10px;
+    padding-bottom: 10px;
 }
 
 /* File Upload Container */
 .file-upload-container {
     text-align: center;
     margin: 10px 0;
+    align-items: center;
 }
 
 /* Footer Styling */
@@ -83,35 +115,40 @@ footer {
     color: white;
     text-align: center;
     width: 100%;
-    margin-top: auto;
+    padding: 10px;
+    position: fixed;
+    bottom: 0;
+    height: 75;
 }
 
 /* Label Styles */
 label {
     display: block;
-    text-align: center;
     margin: 10px 0;
 }
 
 /* Input Styles */
-textarea, input[type="file"] {
+textarea, .content form input[type="file"] {
     width: 100%;
     max-width: 500px;
     margin: 10px 0;
     display: block;
 }
 
-/* Responsive Media Queries */
-@media only screen and (max-width: 768px) {
-    main, .btn, .button-container button, input[type="submit"],
-    textarea, input[type="file"] {
-        width: 95%; /* Full width on small screens */
-    }
+.correct {
+    color: green;
+}
 
-    header {
-        font-size: 24px; /* Adjust font size for smaller screens */
-        padding: 15px 0; /* Adjust padding for smaller screens */
-    }
+.incorrect {
+    color: red;
+}
+
+.checkmark, .cross {
+    font-weight: bold;
+}
+
+.question-review {
+    align-items: left;
 }
 
 /* Navigation Styling */

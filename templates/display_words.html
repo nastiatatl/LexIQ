@@ -12,13 +12,16 @@
     </header>
     
     <main> 
-        <ul>
-            {% for word, synonym in word_synonyms_pairs %}
-                <li>{{ word }} - <span class="synonyms">{{ synonym }}</span></li>
-            {% endfor %}
-        </ul>
-        <div class="button-container">
-            <button onclick="window.location.href='/'">Back</button>
+        <div class="content">
+            <div class="question">
+                {% for word, synonym in word_synonyms_pairs %}
+                    <p>{{ word }} - {{ synonym }}</p>
+                {% endfor %}
+            </div>
+            <div class="button-container">
+                <button onclick="window.location.href='/quiz'" class="btn">Take a Quiz</button>
+                <button type="button" onclick="window.location.href='/'" class="btn">Back</button>
+            </div>
         </div>
     </main>
     
