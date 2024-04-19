@@ -1,4 +1,4 @@
-# cosi_217b_final_project
+# LexIQ
 Final project for COSI 217b NLP Systems
 
 wordhoard retrieves synonyms but it is very slow. it does use a caching system so the synonyms are stored there until the session is over. 
@@ -15,7 +15,7 @@ TODO:
 - synonyms caching/database
 - quiz caching/database
 - quiz page - done
-  - scoring - done, might want to add some statistics (now only displays the score)
+  - scoring - done, displays the user's choice and whether it was correct or not
 - testing - started, not yet pushed
 - requirements.txt (already started)
-- CSS styling - mostly done
+- CSS styling - mostly done, CSS file needs major clean-up
