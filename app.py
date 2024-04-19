@@ -4,7 +4,7 @@ from werkzeug.utils import secure_filename
 import os
 import csv
 
-from prompt import gpt3_5, prompt_from_vocab, distinct_prompt_from_vocab
+from prompt import gpt3_5, prompt_from_vocab, distinct_prompt_from_vocab, synonym_prompt
 
 app = Flask(__name__)
 app.secret_key = "sdhgfvsjhdfsdyfhgieyrtgeyutg78w4cr5iu3vwntuyw98ytgladygaga"
@@ -54,8 +54,13 @@ def save_words():
 def generate_quiz():
     #TODO: implement quiz generation, doesnt have to be in this format, thats just for testing
     model_response = gpt3_5(prompt_from_vocab(session['words'])).split("\n")
-    questions = [{"question": q.replace(session['words'][i], "__________"), "options": [session['words'][i], generate_synonyms(session['words'][i]), generate_synonyms(session['words'][i])], "answer": session['words'][i]} for i, q in enumerate(model_response)]
-    questions = [{"id": i, "data": question} for i, question in enumerate(questions)]
+    gpt_syns = list(map(lambda x: x.split(" ")[:3], gpt3_5(synonym_prompt(session['words'])).split("\n")))
+    print(gpt_syns)
+    print(session['words'][1])
+    # wh_syns = [session['words'][i], generate_synonyms(session['words'][i]), generate_synonyms(session['words'][i])]
+    old_questions = [{"question": q.replace(session['words'][i], "__________"), "options": gpt_syns[i] + [session['words'][i]], "answer": session['words'][i]} for i, q in enumerate(model_response)]
+    questions = [{"id": i, "data": question} for i, question in enumerate(old_questions)]
+    session['questions'] = old_questions
     return render_template('quiz.html', questions=questions)
 
 
@@ -64,8 +69,10 @@ def submit_quiz():
     # Calculate the score and gather feedback
     score = 0
     feedback = []
-    for i, question in enumerate(QUESTIONS):
+    for i, question in enumerate(session['questions']):
         user_answer = request.form.get(f'question{i}')
+        print(user_answer)
+        print(question['answer'])
         is_correct = user_answer == question['answer']
         if is_correct:
             score += 1

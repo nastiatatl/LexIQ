@@ -1,6 +1,6 @@
 from openai import OpenAI
 
-client = OpenAI(api_key="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")
+client = OpenAI(api_key="")
 
 
 # prompt gpt3.5
@@ -20,6 +20,7 @@ def gpt3_5(prompt):
 def prompt_from_vocab(vocab):
     return (f"Given the following words, write a sentence using each word in a sentence"
             f" that highlights the meaning of the word.\nPut each sentence on a new line."
+            f"Do not change the morphology of the word in the sentence."
             f"\n\n{' '.join(vocab)}\n\n---\n\n")
 
 
@@ -27,6 +28,11 @@ def distinct_prompt_from_vocab(vocab):
     return (f"Given the following words, write a sentence using each word in a sentence"
             f" that highlights the meaning of the word.\nPut each sentence on a new line."
             f"\n\n{' '.join(vocab)}\n\n---\n\nMake sure no word could be used in any other sentence!")
+
+
+def synonym_prompt(vocab, n=3):
+    return (f"Given the following words, provide {n} half-synonyms for each word separated by a space.\n"
+            f"Do not repeat the word. Do not use punctuation. Place each set of synonyms on a new line\n\n{' '.join(vocab)}\n\n---\n\n")
 
 
 if __name__ == "__main__":
