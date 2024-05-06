@@ -5,11 +5,15 @@ from utils import generate_synonyms, process_input
 from werkzeug.utils import secure_filename
 import os
 import csv
+import os
+from dotenv import load_dotenv
 
 from prompt import gpt3_5, unified_prompt, gpt4
 
+load_dotenv()
+
 app = Flask(__name__)
-app.secret_key = "sdhgfvsjhdfsdyfhgieyrtgeyutg78w4cr5iu3vwntuyw98ytgladygaga"
+app.secret_key = os.getenv("OPENAI_API_KEY")
 
 # folder 'uploads' should be in the root directory
 app.config['UPLOAD_FOLDER'] = 'uploads'
