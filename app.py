@@ -68,8 +68,7 @@ def save_words():
                              "options": question["options"]}
                             for i, question in enumerate(old_questions)]
 
-    word_synonyms_pairs = list(zip(words, words))
-    words_options = [(w, " ".join(o["options"])) for w, o in zip(words, old_questions)]
+    words_options = [(w, " ".join(o["options"]).replace(o["answer"], "")) for w, o in zip(words, old_questions)]
     return render_template('display_words.html', word_synonyms_pairs=words_options)
 
 @app.route('/quiz', methods=['POST', 'GET'])
@@ -110,6 +109,7 @@ def submit_quiz():
               "NEED MORE PRACTICE!!!" if score > 0 else ":("
 
     return render_template('score.html', score=score, total=total_questions, message=message, feedback=feedback)
+
 
 if __name__ == '__main__':
     app.run(debug=True)
