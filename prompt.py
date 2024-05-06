@@ -1,7 +1,11 @@
 from openai import OpenAI
+import os
+from openai import OpenAI
+import os
+from dotenv import load_dotenv
+load_dotenv()
 
-client = OpenAI(api_key="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")
-
+client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 # prompt gpt3.5
 def gpt3_5(prompt):
