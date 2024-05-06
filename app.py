@@ -53,23 +53,36 @@ def save_words():
             words = process_input(words_text)
 
     # Generate synonyms
-    word_synonyms_pairs = list(zip(words, words))
+    # synonyms = [generate_synonyms(word) for word in words]
+
     # store words in session
     print("STORED:", words)
     session['words'] = words
-    return render_template('display_words.html', word_synonyms_pairs=word_synonyms_pairs)
-
-@app.route('/quiz', methods=['POST', 'GET'])
-def generate_quiz():
     model_response = gpt4(unified_prompt(session['words'])).split("\n\n")
     print(model_response)
     model_response = [q.split("\n") for q in model_response]
     print(model_response)
+
     old_questions = [{"question": q[0].replace(session['words'][i], "__________"),
-                      "options": random.sample([_.strip().split(" ")[-1] for _ in q[1:]] + [session['words'][i]], len(q)),
+                      "options": random.sample([_.strip().split(" ")[-1] for _ in q[1:]] + [session['words'][i]],
+                                               len(q)),
                       "answer": session['words'][i]} for i, q in enumerate(model_response)]
-    questions = [{"id": i, "data": question} for i, question in enumerate(old_questions)]
-    session['questions'] = old_questions
+    session['old_questions'] = old_questions
+    session['questions'] = [{"id": i,
+                             "data": question,
+                             "answer": question["answer"],
+                             "question": question["question"],
+                             "options": question["options"]}
+                            for i, question in enumerate(old_questions)]
+
+    words_options = [(w, " ".join(o["options"]).replace(o["answer"], "")) for w, o in zip(words, old_questions)]
+    return render_template('display_words.html', word_synonyms_pairs=words_options)
+
+@app.route('/quiz', methods=['POST', 'GET'])
+def generate_quiz():
+
+    questions = session['questions']
+    # session['questions'] = old_questions
     return render_template('quiz.html', questions=questions)
 
 
@@ -94,6 +107,7 @@ def submit_quiz():
     message = create_score_message(score, total_questions)
 
     return render_template('score.html', score=score, total=total_questions, message=message, feedback=feedback)
+
 
 if __name__ == '__main__':
     app.run(debug=True)

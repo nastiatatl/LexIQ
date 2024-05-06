@@ -1,8 +1,7 @@
 from openai import OpenAI
 import os
-from openai import OpenAI
-import os
 from dotenv import load_dotenv
+
 load_dotenv()
 
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
@@ -57,7 +56,7 @@ def synonym_prompt(vocab, n=3):
 def unified_prompt(vocab, n=3):
     sent = "His belief that cats can speak human languages is a deviation from normal thinking"
     return (f"You are an SAT vocab question writer. You have a list of words that is the correct answers for a list of questions.\n"
-            f"For each word, create a sentence that highlights the meaning of the word. Also, provide {n} words that do not fit in the blank that will be the wrong answer choices that are similar but still incorrect\n"
+            f"For each word, create a sentence that highlights the meaning of the word. Also, provide {n} words that DO NOT fit in the blank that will be the wrong answer choices\n"
             f"For example, if the word is 'deviation', you could provide the sentence '{sent}.' and the answer choices 'error', 'pause', 'module'.\n"
             f"This is becasue 'deviation' is the correct answer and 'error', 'pause', and 'module' are the wrong answers  because 'error', 'pause' and 'module' do not fit in the sentence where 'deviation' is.\n"
             f"Place each sentence and multiple choice answers on a new line. Separate each question and answer set with two new lines. Such as:\n{sent}\nerror\npause\nmodule\n\n"
