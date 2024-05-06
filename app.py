@@ -18,13 +18,6 @@ app.secret_key = os.getenv("OPENAI_API_KEY")
 # folder 'uploads' should be in the root directory
 app.config['UPLOAD_FOLDER'] = 'uploads'
 
-# NOTE: questions are hardcoded for now
-# QUESTIONS = [
-#     {"question": "The ___ alleyway made her feel uneasy as she walked home late at night.", "options": ["dark", "gloomy", "dim"], "answer": "dark"},
-#     {"question": "The ___ lighting in the restaurant created a cozy and intimate atmosphere.", "options": ["dim", "gloomy", "dark"], "answer": "dim"},
-#     {"question": "The weather that day was ___, matching his melancholic mood.", "options": ["gloomy", "dark", "dim"], "answer": "gloomy"},
-# ]
-
 @app.route('/')
 def index():
     return render_template('index.html')
@@ -36,7 +29,7 @@ def save_words():
     # Check if a file is present in the request
     file = request.files.get('file')
     if file and file.filename != '':
-        if file.filename.endswith('.csv'):
+        if file.filename.endswith('.csv'): # Check if it is a CSV file
             filename = secure_filename(file.filename)
             filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
             file.save(filepath)
@@ -51,9 +44,11 @@ def save_words():
         words_text = request.form.get('words', '')
         if words_text:
             words = process_input(words_text)
+            
+    if words == []: # If no words are provided
+        return "No words provided", 400
 
     # Generate synonyms
-    # synonyms = [generate_synonyms(word) for word in words]
 
     # store words in session
     print("STORED:", words)
@@ -74,7 +69,6 @@ def save_words():
                              "question": question["question"],
                              "options": question["options"]}
                             for i, question in enumerate(old_questions)]
-
     words_options = [(w, " ".join(o["options"]).replace(o["answer"], "")) for w, o in zip(words, old_questions)]
     return render_template('display_words.html', word_synonyms_pairs=words_options)
 
