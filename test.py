@@ -119,8 +119,86 @@ class FlaskAppTestCase(unittest.TestCase):
     def test_no_input(self): 
         with self.app as flask_app:
             response = flask_app.post('/save_words', data={'words': ''}, follow_redirects=True)
-            self.assertEqual(session['words'], [], "Session should be empty if no input is provided.")
-            self.assertEqual(response.status_code, 200, "Response should be 200 OK for no input.")
+            self.assertEqual(response.status_code, 400, "Response should be 400 Bad Request for no input.")
+            
+    def test_quiz_route(self):
+        with self.app as flask_app:
+            with flask_app.session_transaction() as sess:
+                sess['questions'] = [
+                    {'id': 0, 'data': {'question': 'Her wedding dress was truly __________, capturing the essence of elegance and grace.', 'options': ['pretty', 'attractive', 'beautiful', 'handsome'], 'answer': 'beautiful'}, 'answer': 'beautiful', 'question': 'Her wedding dress was truly __________, capturing the essence of elegance and grace.', 'options': ['pretty', 'attractive', 'beautiful', 'handsome']},
+                    {'id': 1, 'data': {'question': 'The old, abandoned warehouse was covered in __________ graffiti and broken windows.', 'options': ['stained', 'unwashed', 'dusty', 'dirty'], 'answer': 'dirty'}, 'answer': 'dirty', 'question': 'The old, abandoned warehouse was covered in __________ graffiti and broken windows.', 'options': ['stained', 'unwashed', 'dusty', 'dirty']},
+                    {'id': 2, 'data': {'question': 'Despite his humble beginnings, he became __________ through years of hard work and smart investments.', 'options': ['abundant', 'ample', 'expensive', 'rich'], 'answer': 'rich'}, 'answer': 'rich', 'question': 'Despite his humble beginnings, he became __________ through years of hard work and smart investments.', 'options': ['abundant', 'ample', 'expensive', 'rich']}
+                ]
+            with captured_templates(app) as templates:
+                response = flask_app.get('/quiz')
+                self.assertEqual(response.status_code, 200, "Should return HTTP 200 for the quiz route")
+                self.assertEqual(len(templates), 1, "Should render exactly one template")
+                template, _ = templates[0]
+                self.assertEqual(template.name, 'quiz.html', "Should render quiz.html")
+                
+    def test_submit_quiz_all_correct(self):
+        with self.app as flask_app:
+            with flask_app.session_transaction() as sess:
+                sess['questions'] = [
+                    {'id': 0, 'data': {'question': 'Her wedding dress was truly __________, capturing the essence of elegance and grace.', 'options': ['pretty', 'attractive', 'beautiful', 'handsome'], 'answer': 'beautiful'}, 'answer': 'beautiful', 'question': 'Her wedding dress was truly __________, capturing the essence of elegance and grace.', 'options': ['pretty', 'attractive', 'beautiful', 'handsome']},
+                    {'id': 1, 'data': {'question': 'The old, abandoned warehouse was covered in __________ graffiti and broken windows.', 'options': ['stained', 'unwashed', 'dusty', 'dirty'], 'answer': 'dirty'}, 'answer': 'dirty', 'question': 'The old, abandoned warehouse was covered in __________ graffiti and broken windows.', 'options': ['stained', 'unwashed', 'dusty', 'dirty']},
+                    {'id': 2, 'data': {'question': 'Despite his humble beginnings, he became __________ through years of hard work and smart investments.', 'options': ['abundant', 'ample', 'expensive', 'rich'], 'answer': 'rich'}, 'answer': 'rich', 'question': 'Despite his humble beginnings, he became __________ through years of hard work and smart investments.', 'options': ['abundant', 'ample', 'expensive', 'rich']}
+                ]
+            with captured_templates(app) as templates:
+                response = flask_app.post('/submit-quiz', data={'question0': 'beautiful', 'question1': 'dirty', 'question2': 'rich'})
+                self.assertEqual(response.status_code, 200, "Should return HTTP 200 for all correct submitted answers")
+                template, context = templates[0]
+                self.assertEqual(template.name, 'score.html', "Should render score.html")
+                self.assertEqual(context['score'], 3, "Score should be 3 for all correct answers")
+                self.assertEqual(context['message'], "PERFECTION!!!", "Message should be 'PERFECTION!!!' for all correct answers")
+                
+    def test_submit_quiz_some_correct(self):
+        with self.app as flask_app:
+            with flask_app.session_transaction() as sess:
+                sess['questions'] = [
+                    {'id': 0, 'data': {'question': 'Her wedding dress was truly __________, capturing the essence of elegance and grace.', 'options': ['pretty', 'attractive', 'beautiful', 'handsome'], 'answer': 'beautiful'}, 'answer': 'beautiful', 'question': 'Her wedding dress was truly __________, capturing the essence of elegance and grace.', 'options': ['pretty', 'attractive', 'beautiful', 'handsome']},
+                    {'id': 1, 'data': {'question': 'The old, abandoned warehouse was covered in __________ graffiti and broken windows.', 'options': ['stained', 'unwashed', 'dusty', 'dirty'], 'answer': 'dirty'}, 'answer': 'dirty', 'question': 'The old, abandoned warehouse was covered in __________ graffiti and broken windows.', 'options': ['stained', 'unwashed', 'dusty', 'dirty']},
+                    {'id': 2, 'data': {'question': 'Despite his humble beginnings, he became __________ through years of hard work and smart investments.', 'options': ['abundant', 'ample', 'expensive', 'rich'], 'answer': 'rich'}, 'answer': 'rich', 'question': 'Despite his humble beginnings, he became __________ through years of hard work and smart investments.', 'options': ['abundant', 'ample', 'expensive', 'rich']}
+                ]
+            with captured_templates(app) as templates:
+                response = flask_app.post('/submit-quiz', data={'question0': 'beautiful', 'question1': 'dusty', 'question2': 'rich'})
+                self.assertEqual(response.status_code, 200, "Should return HTTP 200 for some correct submitted answers")
+                template, context = templates[0]
+                self.assertEqual(template.name, 'score.html', "Should render score.html")
+                self.assertEqual(context['score'], 2, "Score should be 2 for 2 correct answers")
+                self.assertEqual(context['message'], "GOOD JOB!!!", "Message should be 'GOOD JOB!!!' for 2/3 correct answers")
+                
+    def test_submit_quiz_all_incorrect(self):
+        with self.app as flask_app:
+            with flask_app.session_transaction() as sess:
+                sess['questions'] = [
+                    {'id': 0, 'data': {'question': 'Her wedding dress was truly __________, capturing the essence of elegance and grace.', 'options': ['pretty', 'attractive', 'beautiful', 'handsome'], 'answer': 'beautiful'}, 'answer': 'beautiful', 'question': 'Her wedding dress was truly __________, capturing the essence of elegance and grace.', 'options': ['pretty', 'attractive', 'beautiful', 'handsome']},
+                    {'id': 1, 'data': {'question': 'The old, abandoned warehouse was covered in __________ graffiti and broken windows.', 'options': ['stained', 'unwashed', 'dusty', 'dirty'], 'answer': 'dirty'}, 'answer': 'dirty', 'question': 'The old, abandoned warehouse was covered in __________ graffiti and broken windows.', 'options': ['stained', 'unwashed', 'dusty', 'dirty']},
+                    {'id': 2, 'data': {'question': 'Despite his humble beginnings, he became __________ through years of hard work and smart investments.', 'options': ['abundant', 'ample', 'expensive', 'rich'], 'answer': 'rich'}, 'answer': 'rich', 'question': 'Despite his humble beginnings, he became __________ through years of hard work and smart investments.', 'options': ['abundant', 'ample', 'expensive', 'rich']}
+                ]
+            with captured_templates(app) as templates:
+                response = flask_app.post('/submit-quiz', data={'question0': 'pretty', 'question1': 'stained', 'question2': 'ample'})
+                self.assertEqual(response.status_code, 200, "Should return HTTP 200 for all incorrect submitted answers")
+                template, context = templates[0]
+                self.assertEqual(template.name, 'score.html', "Should render score.html")
+                self.assertEqual(context['score'], 0, "Score should be 0 for all incorrect answers")
+                self.assertEqual(context['message'], ":(", "Message should be ':(' for all incorrect answers")
+
+    def test_submit_quiz_no_answers(self):
+        with self.app as flask_app:
+            with flask_app.session_transaction() as sess:
+                sess['questions'] = [
+                    {'id': 0, 'data': {'question': 'Her wedding dress was truly __________, capturing the essence of elegance and grace.', 'options': ['pretty', 'attractive', 'beautiful', 'handsome'], 'answer': 'beautiful'}, 'answer': 'beautiful', 'question': 'Her wedding dress was truly __________, capturing the essence of elegance and grace.', 'options': ['pretty', 'attractive', 'beautiful', 'handsome']},
+                    {'id': 1, 'data': {'question': 'The old, abandoned warehouse was covered in __________ graffiti and broken windows.', 'options': ['stained', 'unwashed', 'dusty', 'dirty'], 'answer': 'dirty'}, 'answer': 'dirty', 'question': 'The old, abandoned warehouse was covered in __________ graffiti and broken windows.', 'options': ['stained', 'unwashed', 'dusty', 'dirty']},
+                    {'id': 2, 'data': {'question': 'Despite his humble beginnings, he became __________ through years of hard work and smart investments.', 'options': ['abundant', 'ample', 'expensive', 'rich'], 'answer': 'rich'}, 'answer': 'rich', 'question': 'Despite his humble beginnings, he became __________ through years of hard work and smart investments.', 'options': ['abundant', 'ample', 'expensive', 'rich']}
+                ]
+            with captured_templates(app) as templates:
+                response = flask_app.post('/submit-quiz', data={'question0': '', 'question1': '', 'question2': ''})
+                self.assertEqual(response.status_code, 200, "Should return HTTP 200 for no submitted answers")
+                template, context = templates[0]
+                self.assertEqual(template.name, 'score.html', "Should render score.html")
+                self.assertEqual(context['score'], 0, "Score should be 0 for no answers")
+                self.assertEqual(context['message'], ":(", "Message should be ':(' for no answers")
 
 if __name__ == '__main__':
     unittest.main()
