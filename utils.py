@@ -1,7 +1,7 @@
 from typing import List
 
 def process_input(input_str: str) -> List[str]:
-    # NOTE: potential unit test: various inputs
+    # Process the input string with words separated by commas, newlines, or spaces
     cleaned_input = input_str.replace(',', ' ').replace('\n', ' ')
     words = cleaned_input.split()
     return words
