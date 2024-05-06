@@ -1,7 +1,7 @@
 import random
 
 from flask import Flask, render_template, request, session
-from utils import generate_synonyms, process_input
+from utils import process_input, create_score_message
 from werkzeug.utils import secure_filename
 import os
 import csv
@@ -19,11 +19,11 @@ app.secret_key = os.getenv("OPENAI_API_KEY")
 app.config['UPLOAD_FOLDER'] = 'uploads'
 
 # NOTE: questions are hardcoded for now
-QUESTIONS = [
-    {"question": "The ___ alleyway made her feel uneasy as she walked home late at night.", "options": ["dark", "gloomy", "dim"], "answer": "dark"},
-    {"question": "The ___ lighting in the restaurant created a cozy and intimate atmosphere.", "options": ["dim", "gloomy", "dark"], "answer": "dim"},
-    {"question": "The weather that day was ___, matching his melancholic mood.", "options": ["gloomy", "dark", "dim"], "answer": "gloomy"},
-]
+# QUESTIONS = [
+#     {"question": "The ___ alleyway made her feel uneasy as she walked home late at night.", "options": ["dark", "gloomy", "dim"], "answer": "dark"},
+#     {"question": "The ___ lighting in the restaurant created a cozy and intimate atmosphere.", "options": ["dim", "gloomy", "dark"], "answer": "dim"},
+#     {"question": "The weather that day was ___, matching his melancholic mood.", "options": ["gloomy", "dark", "dim"], "answer": "gloomy"},
+# ]
 
 @app.route('/')
 def index():
@@ -36,13 +36,16 @@ def save_words():
     # Check if a file is present in the request
     file = request.files.get('file')
     if file and file.filename != '':
-        filename = secure_filename(file.filename)
-        filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-        file.save(filepath)
-        with open(filepath, 'r') as csvfile:
-            csvreader = csv.reader(csvfile)
-            for row in csvreader:
-                words.extend(row)  # Assuming each row contains one word
+        if file.filename.endswith('.csv'):
+            filename = secure_filename(file.filename)
+            filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+            file.save(filepath)
+            with open(filepath, 'r') as csvfile:
+                csvreader = csv.reader(csvfile)
+                for row in csvreader:
+                    words.extend(row)  # Assuming each row contains one word
+        else:
+            return "Unsupported file format", 415 
     else:
         # When no file is uploaded, process the text input
         words_text = request.form.get('words', '')
@@ -50,7 +53,6 @@ def save_words():
             words = process_input(words_text)
 
     # Generate synonyms
-    # synonyms = [generate_synonyms(word) for word in words]
     word_synonyms_pairs = list(zip(words, words))
     # store words in session
     print("STORED:", words)
@@ -78,8 +80,6 @@ def submit_quiz():
     feedback = []
     for i, question in enumerate(session['questions']):
         user_answer = request.form.get(f'question{i}')
-        print(user_answer)
-        print(question['answer'])
         is_correct = user_answer == question['answer']
         if is_correct:
             score += 1
@@ -91,14 +91,7 @@ def submit_quiz():
         })
 
     total_questions = len(session['questions'])
-    percentage = round((score / total_questions) * 100)
-
-    # Determine the message based on the score
-    message = "PERFECTION!!!" if score == total_questions else \
-              "THAT WAS REALLY GOOD!!!" if percentage >= 75 else \
-              "GOOD JOB!!!" if percentage >= 50 else \
-              "NOT BAD!!!" if percentage >= 25 else \
-              "NEED MORE PRACTICE!!!" if score > 0 else ":("
+    message = create_score_message(score, total_questions)
 
     return render_template('score.html', score=score, total=total_questions, message=message, feedback=feedback)
 
