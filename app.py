@@ -1,10 +1,12 @@
+import random
+
 from flask import Flask, render_template, request, session
 from utils import generate_synonyms, process_input
 from werkzeug.utils import secure_filename
 import os
 import csv
 
-from prompt import gpt3_5, prompt_from_vocab, distinct_prompt_from_vocab, synonym_prompt
+from prompt import gpt3_5, unified_prompt, gpt4
 
 app = Flask(__name__)
 app.secret_key = "sdhgfvsjhdfsdyfhgieyrtgeyutg78w4cr5iu3vwntuyw98ytgladygaga"
@@ -44,21 +46,22 @@ def save_words():
             words = process_input(words_text)
 
     # Generate synonyms
-    synonyms = [generate_synonyms(word) for word in words]
-    word_synonyms_pairs = list(zip(words, synonyms))
+    # synonyms = [generate_synonyms(word) for word in words]
+    word_synonyms_pairs = list(zip(words, words))
     # store words in session
+    print("STORED:", words)
     session['words'] = words
     return render_template('display_words.html', word_synonyms_pairs=word_synonyms_pairs)
 
 @app.route('/quiz', methods=['POST', 'GET'])
 def generate_quiz():
-    #TODO: implement quiz generation, doesnt have to be in this format, thats just for testing
-    model_response = gpt3_5(prompt_from_vocab(session['words'])).split("\n")
-    gpt_syns = list(map(lambda x: x.split(" ")[:3], gpt3_5(synonym_prompt(session['words'])).split("\n")))
-    print(gpt_syns)
-    print(session['words'][1])
-    # wh_syns = [session['words'][i], generate_synonyms(session['words'][i]), generate_synonyms(session['words'][i])]
-    old_questions = [{"question": q.replace(session['words'][i], "__________"), "options": gpt_syns[i] + [session['words'][i]], "answer": session['words'][i]} for i, q in enumerate(model_response)]
+    model_response = gpt4(unified_prompt(session['words'])).split("\n\n")
+    print(model_response)
+    model_response = [q.split("\n") for q in model_response]
+    print(model_response)
+    old_questions = [{"question": q[0].replace(session['words'][i], "__________"),
+                      "options": random.sample([_.strip().split(" ")[-1] for _ in q[1:]] + [session['words'][i]], len(q)),
+                      "answer": session['words'][i]} for i, q in enumerate(model_response)]
     questions = [{"id": i, "data": question} for i, question in enumerate(old_questions)]
     session['questions'] = old_questions
     return render_template('quiz.html', questions=questions)
@@ -83,7 +86,7 @@ def submit_quiz():
             'is_correct': is_correct
         })
 
-    total_questions = len(QUESTIONS)
+    total_questions = len(session['questions'])
     percentage = round((score / total_questions) * 100)
 
     # Determine the message based on the score
@@ -94,9 +97,6 @@ def submit_quiz():
               "NEED MORE PRACTICE!!!" if score > 0 else ":("
 
     return render_template('score.html', score=score, total=total_questions, message=message, feedback=feedback)
-
-
-
 
 if __name__ == '__main__':
     app.run(debug=True)
