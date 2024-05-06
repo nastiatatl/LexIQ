@@ -1,3 +1,4 @@
 __pycache__/
 wordhoard_error.yaml
 test.csv
+.env
