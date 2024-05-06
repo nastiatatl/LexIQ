@@ -17,6 +17,9 @@ def captured_templates(app):
         template_rendered.disconnect(record, app)
 
 class TestCreateScoreMessage(unittest.TestCase):
+    """ 
+    Test the create_score_message function in utils.py
+    """
 
     def test_perfection(self):
         message = create_score_message(10, 10)
@@ -54,6 +57,9 @@ class TestCreateScoreMessage(unittest.TestCase):
         self.assertEqual(message, expected, f"Expected '{expected}', but got '{message}'")
 
 class TestProcessInput(unittest.TestCase):
+    """
+    Test the process_input function in utils.py
+    """
     def test_basic_functionality(self):
         self.assertEqual(process_input("beautiful,dirty,rich"), ['beautiful', 'dirty', 'rich'], "Should split input on commas")
 
@@ -64,9 +70,12 @@ class TestProcessInput(unittest.TestCase):
     def test_empty_strings(self):
         self.assertEqual(process_input(""), [], "Should return an empty list for empty string")
         self.assertEqual(process_input(" "), [], "Should return an empty list for single space")
+        
+    def test_separators_only(self):
         self.assertEqual(process_input(",\n"), [], "Should return an empty list for only separators")
         self.assertEqual(process_input(", \n"), [], "Should return an empty list for only separators")
-
+        self.assertEqual(process_input("\n,  ,\n"), [], "Should return an empty list for only separators")
+        
     def test_no_separators(self):
         self.assertEqual(process_input("beautiful"), ['beautiful'], "Should handle single word input without separators")
 
@@ -74,14 +83,20 @@ class TestProcessInput(unittest.TestCase):
         self.assertEqual(process_input("beautiful,, ,\nrich"), ['beautiful', 'rich'], "Should ignore multiple consecutive separators")
         self.assertEqual(process_input(",,\n , ,,,\ndirty,rich"), ['dirty', 'rich'], "Should correctly process repeated separators with valid words")
         
-class FlaskAppTestCase(unittest.TestCase):
+class TestFlaskApp(unittest.TestCase):
+    """
+    Test the Flask app routes and functionality
+    """
 
     def setUp(self):
         app.config['TESTING'] = True
-        app.config['UPLOAD_FOLDER'] = 'uploads'  # Configure this as needed
+        app.config['UPLOAD_FOLDER'] = 'uploads'  
         self.app = app.test_client()
 
     def test_index_route(self):
+        """
+        Test the index route
+        """
         with captured_templates(app) as templates:
             response = self.app.get('/')
             self.assertEqual(response.status_code, 200, "Should return HTTP 200")
@@ -90,6 +105,9 @@ class FlaskAppTestCase(unittest.TestCase):
             self.assertEqual(template.name, 'index.html', "Should render index.html") 
             
     def test_save_words_route(self):
+        """
+        Test the save_words route
+        """
         with captured_templates(app) as templates:
             response = self.app.post('/save_words', data={'words': 'beautiful,dirty,rich'})
             self.assertEqual(response.status_code, 200, "Should return HTTP 200 for text input")
@@ -98,6 +116,9 @@ class FlaskAppTestCase(unittest.TestCase):
             self.assertEqual(template.name, 'display_words.html', "Should render display_words.html for text input")   
             
     def test_upload_csv_file(self):
+        """
+        Test uploading a CSV file in the save_words route
+        """
         data = {'file': (io.BytesIO(b'beautiful,dirty,rich'), 'test.csv')}
         with self.app as flask_app:
             response = flask_app.post('/save_words', data=data, content_type='multipart/form-data')
@@ -105,23 +126,45 @@ class FlaskAppTestCase(unittest.TestCase):
             self.assertEqual(response.status_code, 200, "Response should be 200 OK for successful file upload")
             
     def test_reject_non_csv_file(self):
+        """
+        Test rejecting a non-CSV file in the save_words route
+        """
         data = {'file': (io.BytesIO(b'beautiful dirty rich'), 'test.txt')}
         with self.app as flask_app:
             response = flask_app.post('/save_words', data=data, content_type='multipart/form-data')
             self.assertEqual(response.status_code, 415, "Response should be 415 Unsupported Media Type for non-CSV file upload")
 
     def test_input_text(self):
+        """
+        Test text input in the save_words route
+        """
         with self.app as flask_app:
             response = flask_app.post('/save_words', data={'words': 'beautiful,dirty,rich'}, follow_redirects=True)
             self.assertEqual(session['words'], ['beautiful', 'dirty', 'rich'], "Session should be updated with words from form input.")
             self.assertEqual(response.status_code, 200, "Response should be 200 OK for successful text input")
 
-    def test_no_input(self): 
+    def test_no_input(self):
+        """
+        Test no text input in the save_words route
+        """ 
         with self.app as flask_app:
             response = flask_app.post('/save_words', data={'words': ''}, follow_redirects=True)
             self.assertEqual(response.status_code, 400, "Response should be 400 Bad Request for no input.")
             
+    def test_both_input_types(self):
+        """
+        Test if both text and file input are provided in the save_words route
+        """
+        data = {'file': (io.BytesIO(b'beautiful,dirty,rich'), 'test.csv'), 'words': 'good,bad,ugly'}
+        with self.app as flask_app:
+            response = flask_app.post('/save_words', data=data, follow_redirects=True)
+            self.assertEqual(session['words'], ['beautiful', 'dirty', 'rich'], "Session should be updated with words from uploaded file.")
+            self.assertEqual(response.status_code, 200, "Response should be 200 OK for successful file upload")
+            
     def test_quiz_route(self):
+        """
+        Test the quiz route
+        """
         with self.app as flask_app:
             with flask_app.session_transaction() as sess:
                 sess['questions'] = [
@@ -137,6 +180,9 @@ class FlaskAppTestCase(unittest.TestCase):
                 self.assertEqual(template.name, 'quiz.html', "Should render quiz.html")
                 
     def test_submit_quiz_all_correct(self):
+        """
+        Test submitting all correct answers in the submit_quiz route
+        """
         with self.app as flask_app:
             with flask_app.session_transaction() as sess:
                 sess['questions'] = [
@@ -153,6 +199,9 @@ class FlaskAppTestCase(unittest.TestCase):
                 self.assertEqual(context['message'], "PERFECTION!!!", "Message should be 'PERFECTION!!!' for all correct answers")
                 
     def test_submit_quiz_some_correct(self):
+        """
+        Test submitting some correct answers in the submit_quiz route
+        """
         with self.app as flask_app:
             with flask_app.session_transaction() as sess:
                 sess['questions'] = [
@@ -169,6 +218,9 @@ class FlaskAppTestCase(unittest.TestCase):
                 self.assertEqual(context['message'], "GOOD JOB!!!", "Message should be 'GOOD JOB!!!' for 2/3 correct answers")
                 
     def test_submit_quiz_all_incorrect(self):
+        """
+        Test submitting all incorrect answers in the submit_quiz route
+        """
         with self.app as flask_app:
             with flask_app.session_transaction() as sess:
                 sess['questions'] = [
@@ -185,6 +237,9 @@ class FlaskAppTestCase(unittest.TestCase):
                 self.assertEqual(context['message'], ":(", "Message should be ':(' for all incorrect answers")
 
     def test_submit_quiz_no_answers(self):
+        """
+        Test submitting no answers in the submit_quiz route
+        """
         with self.app as flask_app:
             with flask_app.session_transaction() as sess:
                 sess['questions'] = [
