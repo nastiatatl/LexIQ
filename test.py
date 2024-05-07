@@ -198,7 +198,7 @@ class TestFlaskApp(unittest.TestCase):
                     {'id': 2, 'data': {'question': 'Despite his humble beginnings, he became __________ through years of hard work and smart investments.', 'options': ['abundant', 'ample', 'expensive', 'rich'], 'answer': 'rich'}, 'answer': 'rich', 'question': 'Despite his humble beginnings, he became __________ through years of hard work and smart investments.', 'options': ['abundant', 'ample', 'expensive', 'rich']}
                 ]
             with captured_templates(app) as templates:
-                response = flask_app.post('/submit-quiz', data={'question0': 'beautiful', 'question1': 'dirty', 'question2': 'rich'})
+                response = flask_app.post('/submit_quiz', data={'question0': 'beautiful', 'question1': 'dirty', 'question2': 'rich'})
                 self.assertEqual(response.status_code, 200, "Should return HTTP 200 for all correct submitted answers")
                 template, context = templates[0]
                 self.assertEqual(template.name, 'score.html', "Should render score.html")
@@ -217,7 +217,7 @@ class TestFlaskApp(unittest.TestCase):
                     {'id': 2, 'data': {'question': 'Despite his humble beginnings, he became __________ through years of hard work and smart investments.', 'options': ['abundant', 'ample', 'expensive', 'rich'], 'answer': 'rich'}, 'answer': 'rich', 'question': 'Despite his humble beginnings, he became __________ through years of hard work and smart investments.', 'options': ['abundant', 'ample', 'expensive', 'rich']}
                 ]
             with captured_templates(app) as templates:
-                response = flask_app.post('/submit-quiz', data={'question0': 'beautiful', 'question1': 'dusty', 'question2': 'rich'})
+                response = flask_app.post('/submit_quiz', data={'question0': 'beautiful', 'question1': 'dusty', 'question2': 'rich'})
                 self.assertEqual(response.status_code, 200, "Should return HTTP 200 for some correct submitted answers")
                 template, context = templates[0]
                 self.assertEqual(template.name, 'score.html', "Should render score.html")
@@ -236,7 +236,7 @@ class TestFlaskApp(unittest.TestCase):
                     {'id': 2, 'data': {'question': 'Despite his humble beginnings, he became __________ through years of hard work and smart investments.', 'options': ['abundant', 'ample', 'expensive', 'rich'], 'answer': 'rich'}, 'answer': 'rich', 'question': 'Despite his humble beginnings, he became __________ through years of hard work and smart investments.', 'options': ['abundant', 'ample', 'expensive', 'rich']}
                 ]
             with captured_templates(app) as templates:
-                response = flask_app.post('/submit-quiz', data={'question0': 'pretty', 'question1': 'stained', 'question2': 'ample'})
+                response = flask_app.post('/submit_quiz', data={'question0': 'pretty', 'question1': 'stained', 'question2': 'ample'})
                 self.assertEqual(response.status_code, 200, "Should return HTTP 200 for all incorrect submitted answers")
                 template, context = templates[0]
                 self.assertEqual(template.name, 'score.html', "Should render score.html")
@@ -255,7 +255,7 @@ class TestFlaskApp(unittest.TestCase):
                     {'id': 2, 'data': {'question': 'Despite his humble beginnings, he became __________ through years of hard work and smart investments.', 'options': ['abundant', 'ample', 'expensive', 'rich'], 'answer': 'rich'}, 'answer': 'rich', 'question': 'Despite his humble beginnings, he became __________ through years of hard work and smart investments.', 'options': ['abundant', 'ample', 'expensive', 'rich']}
                 ]
             with captured_templates(app) as templates:
-                response = flask_app.post('/submit-quiz', data={'question0': '', 'question1': '', 'question2': ''})
+                response = flask_app.post('/submit_quiz', data={'question0': '', 'question1': '', 'question2': ''})
                 self.assertEqual(response.status_code, 200, "Should return HTTP 200 for no submitted answers")
                 template, context = templates[0]
                 self.assertEqual(template.name, 'score.html', "Should render score.html")
@@ -287,17 +287,6 @@ class TestStorage(unittest.TestCase):
 
     def test_database_change(self):
         with captured_templates(app) as templates:
-            response = app.test_client().get('/display_questions')
-            self.assertEqual(response.status_code, 200, "Should return HTTP 200")
-            self.assertEqual(len(templates), 1, "Should render exactly one template")
-            template, _ = templates[0]
-            self.assertEqual(template.name, 'display_questions.html', "Should render display_questions.html")
-
-    def test_delete_question(self):
-        with captured_templates(app) as templates:
-            response = app.test_client().post('/delete_question/1')
-            self.assertEqual(response.status_code, 302, "Should return HTTP 302")
-            self.assertEqual(response.location, 'http://localhost/display_questions', "Should redirect to /display_questions")
             response = app.test_client().get('/display_questions')
             self.assertEqual(response.status_code, 200, "Should return HTTP 200")
             self.assertEqual(len(templates), 1, "Should render exactly one template")

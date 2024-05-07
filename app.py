@@ -48,7 +48,7 @@ def index():
 def display_questions():
     # retrieve questions from database
     questions = Question.query.all()
-    print(questions)
+    # print(questions)
     return render_template('display_questions.html', questions=questions)
 
 @app.route('/delete_question/<int:qid>', methods=['POST', 'GET'])
@@ -88,7 +88,7 @@ def save_words():
         return "No words provided", 400
 
     # store words in session
-    print("STORED:", words)
+    # print("STORED:", words)
     session['words'] = words
 
     # split by word
@@ -130,22 +130,25 @@ def save_words():
 @app.route('/quiz', methods=['POST', 'GET'])
 def quiz():
     # generate quiz from stored questions
-    questions = session['questions']
+    if 'questions' not in session:
+        questions = []
+    else:
+        questions = session['questions']
     return render_template('quiz.html', questions=questions)
 
 @app.route('/saved_quiz', methods=['POST'])
 def saved_quiz():
     responses = []
-    print(request.form.keys())
+    # print(request.form.keys())
     for key in request.form.keys():
         if key.startswith('add'):
             responses.append(request.form.getlist(key)[0])
 
     # create a quiz with the questions with the IDs in responses from sqlite
     db_questions = Question.query.all()
-    for q in db_questions:
-        print(q.id)
-    print(responses)
+    # for q in db_questions:
+        # print(q.id)
+    # print(responses)
     questions = [{"id": i,
                   "question": q.text,
                   "options": [q.option1, q.option2, q.option3, q.option4],
