@@ -5,6 +5,8 @@ from contextlib import contextmanager
 from app import app  
 import io
 
+from prompt import gpt4, unified_prompt
+
 @contextmanager
 def captured_templates(app):
     recorded = []
@@ -255,5 +257,27 @@ class TestFlaskApp(unittest.TestCase):
                 self.assertEqual(context['score'], 0, "Score should be 0 for no answers")
                 self.assertEqual(context['message'], ":(", "Message should be ':(' for no answers")
 
+
+class TestGeneration(unittest.TestCase):
+
+    def setUp(self):
+        app.config['TESTING'] = True
+        app.config['UPLOAD_FOLDER'] = 'uploads'
+        self.app = app.test_client()
+
+    def test_prompt(self):
+        response = gpt4(unified_prompt("beautiful dirty rich".split()))
+        response = response.split("\n\n")
+
+        # response is of length 3
+        self.assertEqual(len(response), 3)
+
+        # there are four answer choices for each question
+        self.assertEqual(len(response[0].split("\n")), 4)
+        self.assertEqual(len(response[1].split("\n")), 4)
+        self.assertEqual(len(response[2].split("\n")), 4)
+
+
 if __name__ == '__main__':
     unittest.main()
+    
