@@ -136,6 +136,7 @@ def quiz():
         questions = session['questions']
     return render_template('quiz.html', questions=questions)
 
+
 @app.route('/saved_quiz', methods=['POST'])
 def saved_quiz():
     responses = []
@@ -182,4 +183,4 @@ def submit_quiz():
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=False)
