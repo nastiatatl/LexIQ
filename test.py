@@ -283,5 +283,43 @@ class TestGeneration(unittest.TestCase):
         self.assertEqual(len(response[2].split("\n")), 4)
 
 
+class TestStorage(unittest.TestCase):
+
+    def test_database_change(self):
+        with captured_templates(app) as templates:
+            response = app.test_client().get('/display_questions')
+            self.assertEqual(response.status_code, 200, "Should return HTTP 200")
+            self.assertEqual(len(templates), 1, "Should render exactly one template")
+            template, _ = templates[0]
+            self.assertEqual(template.name, 'display_questions.html', "Should render display_questions.html")
+
+    def test_delete_question(self):
+        with captured_templates(app) as templates:
+            response = app.test_client().post('/delete_question/1')
+            self.assertEqual(response.status_code, 302, "Should return HTTP 302")
+            self.assertEqual(response.location, 'http://localhost/display_questions', "Should redirect to /display_questions")
+            response = app.test_client().get('/display_questions')
+            self.assertEqual(response.status_code, 200, "Should return HTTP 200")
+            self.assertEqual(len(templates), 1, "Should render exactly one template")
+            template, _ = templates[0]
+            self.assertEqual(template.name, 'display_questions.html', "Should render display_questions.html")
+
+    def test_quiz_route(self):
+        with captured_templates(app) as templates:
+            response = app.test_client().get('/quiz')
+            self.assertEqual(response.status_code, 200, "Should return HTTP 200")
+            self.assertEqual(len(templates), 1, "Should render exactly one template")
+            template, _ = templates[0]
+            self.assertEqual(template.name, 'quiz.html', "Should render quiz.html")
+
+    def test_display_questions(self):
+        with captured_templates(app) as templates:
+            response = app.test_client().get('/display_questions')
+            self.assertEqual(response.status_code, 200, "Should return HTTP 200")
+            self.assertEqual(len(templates), 1, "Should render exactly one template")
+            template, _ = templates[0]
+            self.assertEqual(template.name, 'display_questions.html', "Should render display_questions.html")
+
+
 if __name__ == '__main__':
     unittest.main()

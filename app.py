@@ -43,6 +43,22 @@ with app.app_context():
 def index():
     return render_template('index.html')
 
+# page to display stored questions
+@app.route('/display_questions')
+def display_questions():
+    # retrieve questions from database
+    questions = Question.query.all()
+    print(questions)
+    return render_template('display_questions.html', questions=questions)
+
+@app.route('/delete_question/<int:qid>', methods=['POST', 'GET'])
+def delete_question(qid):
+    # delete a question from the database
+    question = Question.query.get(qid)
+    db.session.delete(question)
+    db.session.commit()
+    return redirect('/display_questions')
+
 
 # processes the input words after submitting the form
 @app.route('/save_words', methods=['POST'])
@@ -111,23 +127,6 @@ def save_words():
     return render_template('display_words.html', word_synonyms_pairs=words_options)
 
 
-# page to display stored questions
-@app.route('/display_questions')
-def display_questions():
-    # retrieve questions from database
-    questions = Question.query.all()
-    print(questions)
-    return render_template('display_questions.html', questions=questions)
-
-@app.route('/delete_question/<int:qid>', methods=['POST', 'GET'])
-def delete_question(qid):
-    # delete a question from the database
-    question = Question.query.get(qid)
-    db.session.delete(question)
-    db.session.commit()
-    return redirect('/display_questions')
-
-
 @app.route('/quiz', methods=['POST', 'GET'])
 def quiz():
     # generate quiz from stored questions
@@ -147,10 +146,11 @@ def saved_quiz():
     for q in db_questions:
         print(q.id)
     print(responses)
-    questions = [{"question": q.text,
+    questions = [{"id": i,
+                  "question": q.text,
                   "options": [q.option1, q.option2, q.option3, q.option4],
-                  "answer": q.correct_answer} for q in db_questions if str(q.id) in responses]
-
+                  "answer": q.correct_answer} for i, q in enumerate(db_questions) if str(q.id) in responses]
+    session['questions'] = questions
 
     return render_template('quiz.html', questions=questions)
 
@@ -161,7 +161,7 @@ def submit_quiz():
     score = 0
     feedback = []
     for i, question in enumerate(session['questions']):
-        user_answer = request.form.get(f'question{i}')
+        user_answer = request.form.get(f'question{question["id"]}')
         is_correct = user_answer == question['answer']
         if is_correct:
             score += 1
