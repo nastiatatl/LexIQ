@@ -12,11 +12,11 @@
     </header>
     <main> 
         <div class="content">
-            <form action="/submit-quiz" method="post">
+            <form action="/submit_quiz" method="post">
                 {% for question in questions %}
                     <div class="question"> 
-                        <p>{{ question.data.question | safe }}</p>
-                        {% for option in question.data.options %}
+                        <p>{{ question.question | safe }}</p>
+                        {% for option in question.options %}
                             <input type="radio" id="question{{ question.id }}option{{ loop.index }}" name="question{{ question.id }}" value="{{ option }}">
                             <label for="question{{ question.id }}option{{ loop.index }}">{{ option }}</label>
                         {% endfor %}

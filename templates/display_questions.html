@@ -1,0 +1,47 @@
+<!-- html file that displays the questions in the database -->
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Questions</title>
+    <link rel="stylesheet" href="/static/app.css">
+</head>
+<body>
+    <header><h1>Questions</h1></header>
+    <main>
+        <div class="content">
+        <form action="/saved_quiz" method="post">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Question</th>
+                        <th>Answer</th>
+                        <th>Add?</th>
+                        <th>Delete?</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for question in questions %}
+                    <tr>
+                        <td>{{ question.text }}</td>
+                        <td>{{ question.correct_answer }}</td>
+                        <td>
+                            <input type="checkbox" name="add{{ question.id }}" value="{{ question.id }}">
+                        </td>
+                        <td>
+                            <!-- dont use a form, just redirect -->
+                            <a href="/delete_question/{{ question.id }}">Delete</a>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        <div class="button-container">
+            <input type="submit" value="Create Quiz">
+            <button type="button" onclick="window.location.href='/'" class="btn">Back</button>
+        </div>
+        </form>
+        </div>
+    </main>
+</body>
+</html>
