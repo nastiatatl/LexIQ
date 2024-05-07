@@ -1,6 +1,6 @@
 import unittest
 from utils import create_score_message, process_input
-from flask import Flask, template_rendered, session
+from flask import template_rendered, session
 from contextlib import contextmanager
 from app import app  
 import io
@@ -11,6 +11,7 @@ from prompt import gpt4, unified_prompt
 @contextmanager
 def captured_templates(app):
     recorded = []
+
     def record(sender, template, context, **extra):
         recorded.append((template, context))
     template_rendered.connect(record, app)
