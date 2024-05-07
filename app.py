@@ -3,13 +3,13 @@ import random
 from flask import Flask, render_template, request, session
 from utils import process_input, create_score_message
 from werkzeug.utils import secure_filename
-import os
 import csv
 import os
 from dotenv import load_dotenv
 
 from prompt import gpt3_5, unified_prompt, gpt4
 
+# load in OpenAI API key
 load_dotenv()
 
 app = Flask(__name__)
@@ -18,14 +18,15 @@ app.secret_key = os.getenv("OPENAI_API_KEY")
 # folder 'uploads' should be in the root directory
 app.config['UPLOAD_FOLDER'] = 'uploads'
 
+# landing page
 @app.route('/')
 def index():
     return render_template('index.html')
 
+# processes the input words after submitting the form
 @app.route('/save_words', methods=['POST'])
 def save_words():
     words = []  # Initialize the words list
-
     # Check if a file is present in the request
     file = request.files.get('file')
     if file and file.filename != '':
@@ -44,39 +45,44 @@ def save_words():
         words_text = request.form.get('words', '')
         if words_text:
             words = process_input(words_text)
-            
-    if words == []: # If no words are provided
-        return "No words provided", 400
 
-    # Generate synonyms
+    # If no words are provided
+    if not words:
+        return "No words provided", 400
 
     # store words in session
     print("STORED:", words)
     session['words'] = words
-    model_response = gpt4(unified_prompt(session['words'])).split("\n\n")
-    print(model_response)
-    model_response = [q.split("\n") for q in model_response]
-    print(model_response)
 
+    # split by word
+    model_response = gpt4(unified_prompt(session['words'])).split("\n\n")
+
+    # split into question and answer choices
+    model_response = [q.split("\n") for q in model_response]
+
+    # package questions and send to page
     old_questions = [{"question": q[0].replace(session['words'][i], "__________"),
                       "options": random.sample([_.strip().split(" ")[-1] for _ in q[1:]] + [session['words'][i]],
                                                len(q)),
                       "answer": session['words'][i]} for i, q in enumerate(model_response)]
-    session['old_questions'] = old_questions
+
+    # store questions
     session['questions'] = [{"id": i,
                              "data": question,
                              "answer": question["answer"],
                              "question": question["question"],
                              "options": question["options"]}
                             for i, question in enumerate(old_questions)]
+
+    # display answer choices to user
     words_options = [(w, " ".join(o["options"]).replace(o["answer"], "")) for w, o in zip(words, old_questions)]
+
     return render_template('display_words.html', word_synonyms_pairs=words_options)
 
 @app.route('/quiz', methods=['POST', 'GET'])
 def generate_quiz():
-
+    # generate quiz from stored questions
     questions = session['questions']
-    # session['questions'] = old_questions
     return render_template('quiz.html', questions=questions)
 
 

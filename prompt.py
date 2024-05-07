@@ -64,5 +64,5 @@ def unified_prompt(vocab, n=3):
 
 
 if __name__ == "__main__":
-    #print(gpt3_5(prompt_from_vocab("describe help decide maintain polish".split(" "))))
     print(gpt3_5(unified_prompt("special manifest destroy".split(" "))))
+    print(gpt4(unified_prompt("special manifest destroy".split(" "))))
