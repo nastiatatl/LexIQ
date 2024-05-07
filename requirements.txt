@@ -1,2 +1,4 @@
-flask
-openai
+flask~=2.2.5
+openai~=1.23.1
+werkzeug~=2.3.8
+python-dotenv~=1.0.1

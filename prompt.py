@@ -34,8 +34,6 @@ def gpt4(prompt):
     return response.choices[0].message.content
 
 
-
-
 def prompt_from_vocab(vocab):
     return (f"Given the following words, write a sentence using each word in a sentence"
             f" that highlights the meaning of the word.\nPut each sentence on a new line."
@@ -53,6 +51,7 @@ def synonym_prompt(vocab, n=3):
     return (f"Given the following words, provide {n} half-synonyms for each word separated by a space.\n"
             f"Do not repeat the word. Do not use punctuation. Place each set of synonyms on a new line\n\n{' '.join(vocab)}\n\n---\n\n")
 
+# best prompt!!
 def unified_prompt(vocab, n=3):
     sent = "His belief that cats can speak human languages is a deviation from normal thinking"
     return (f"You are an SAT vocab question writer. You have a list of words that is the correct answers for a list of questions.\n"
