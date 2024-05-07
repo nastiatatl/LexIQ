@@ -7,6 +7,7 @@ import io
 
 from prompt import gpt4, unified_prompt
 
+
 @contextmanager
 def captured_templates(app):
     recorded = []
@@ -17,6 +18,7 @@ def captured_templates(app):
         yield recorded
     finally:
         template_rendered.disconnect(record, app)
+
 
 class TestCreateScoreMessage(unittest.TestCase):
     """ 
@@ -58,6 +60,7 @@ class TestCreateScoreMessage(unittest.TestCase):
         expected = "THAT WAS REALLY GOOD!!!"
         self.assertEqual(message, expected, f"Expected '{expected}', but got '{message}'")
 
+
 class TestProcessInput(unittest.TestCase):
     """
     Test the process_input function in utils.py
@@ -84,7 +87,8 @@ class TestProcessInput(unittest.TestCase):
     def test_repeated_separators(self):
         self.assertEqual(process_input("beautiful,, ,\nrich"), ['beautiful', 'rich'], "Should ignore multiple consecutive separators")
         self.assertEqual(process_input(",,\n , ,,,\ndirty,rich"), ['dirty', 'rich'], "Should correctly process repeated separators with valid words")
-        
+
+
 class TestFlaskApp(unittest.TestCase):
     """
     Test the Flask app routes and functionality

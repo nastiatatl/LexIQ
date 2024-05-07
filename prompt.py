@@ -6,6 +6,7 @@ load_dotenv()
 
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
+
 # prompt gpt3.5
 def gpt3_5(prompt):
     message = {
@@ -19,6 +20,7 @@ def gpt3_5(prompt):
         temperature=0.1,
     )
     return response.choices[0].message.content
+
 
 def gpt4(prompt):
     message = {
@@ -50,6 +52,7 @@ def distinct_prompt_from_vocab(vocab):
 def synonym_prompt(vocab, n=3):
     return (f"Given the following words, provide {n} half-synonyms for each word separated by a space.\n"
             f"Do not repeat the word. Do not use punctuation. Place each set of synonyms on a new line\n\n{' '.join(vocab)}\n\n---\n\n")
+
 
 # best prompt!!
 def unified_prompt(vocab, n=3):

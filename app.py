@@ -1,13 +1,11 @@
-import random
-
 from flask import Flask, render_template, request, session
 from utils import process_input, create_score_message
 from werkzeug.utils import secure_filename
+from dotenv import load_dotenv
 import csv
 import os
-from dotenv import load_dotenv
-
-from prompt import gpt3_5, unified_prompt, gpt4
+import random
+from prompt import unified_prompt, gpt4
 
 # load in OpenAI API key
 load_dotenv()
@@ -18,10 +16,12 @@ app.secret_key = os.getenv("OPENAI_API_KEY")
 # folder 'uploads' should be in the root directory
 app.config['UPLOAD_FOLDER'] = 'uploads'
 
+
 # landing page
 @app.route('/')
 def index():
     return render_template('index.html')
+
 
 # processes the input words after submitting the form
 @app.route('/save_words', methods=['POST'])
@@ -39,7 +39,7 @@ def save_words():
                 for row in csvreader:
                     words.extend(row)  # Assuming each row contains one word
         else:
-            return "Unsupported file format", 415 
+            return "Unsupported file format", 415
     else:
         # When no file is uploaded, process the text input
         words_text = request.form.get('words', '')
@@ -78,6 +78,7 @@ def save_words():
     words_options = [(w, " ".join(o["options"]).replace(o["answer"], "")) for w, o in zip(words, old_questions)]
 
     return render_template('display_words.html', word_synonyms_pairs=words_options)
+
 
 @app.route('/quiz', methods=['POST', 'GET'])
 def generate_quiz():

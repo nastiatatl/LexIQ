@@ -1,10 +1,12 @@
 from typing import List
 
+
 def process_input(input_str: str) -> List[str]:
     # Process the input string with words separated by commas, newlines, or spaces
     cleaned_input = input_str.replace(',', ' ').replace('\n', ' ')
     words = cleaned_input.split()
     return words
+
 
 def create_score_message(score: int, total_questions: int) -> str:
     # Determine the message based on the score
